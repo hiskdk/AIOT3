@@ -27,7 +27,7 @@ DietSense 整合**自然語言輸入、主動式智慧互動、情境感知與�
 
 本專案全面採用 **OpenSpec 規格驅動開發流程**：
 - 所有架構設計與系統行為合約均先於 `openspec/changes/dietsense-proposal-refactor/specs/` 完成規格定義，再行實施編程。
-- 完整的系統工程決策、八大模組架構、流程圖與演算法虛擬碼請參閱根目錄的 [`DESIGN.md`](file:///c:/Users/ccm49/OneDrive/物聯網DIC3/DESIGN.md)。
+- 完整的系統工程決策、八大模組架構、流程圖與演算法虛擬碼請參閱根目錄的 [`DESIGN.md`](DESIGN.md)。
 - 驗證目前規格狀態：
   ```powershell
   openspec validate dietsense-proposal-refactor
