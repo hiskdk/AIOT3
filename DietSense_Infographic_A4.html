@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>DietSense 專題提案系統性解析資訊圖表</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 5mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: #0f172a;
+      color: #1e293b;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-font-smoothing: antialiased;
+    }
+    .print-bar {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      z-index: 9999;
+    }
+    .print-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background 0.2s;
+    }
+    .print-btn:hover {
+      background: #1d4ed8;
+    }
+    .a4-container {
+      width: 1380px;
+      min-height: 940px;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .print-bar {
+        display: none;
+      }
+      .a4-container {
+        width: 100% !important;
+        min-height: auto !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+      }
+    }
+    /* Header */
+    .header-bar {
+      background: linear-gradient(135deg, #0b2545 0%, #133a68 100%);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 6px solid #38bdf8;
+    }
+    .header-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-icon {
+      font-size: 24px;
+      background: #1e40af;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .header-main-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .header-main-title span {
+      color: #38bdf8;
+    }
+    .header-sub {
+      font-size: 11px;
+      color: #cbd5e1;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    /* Main Grid */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 32% 38% 30%;
+      gap: 8px;
+      flex: 1;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Card Box Styles */
+    .card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-header {
+      background: #0f2b48;
+      color: #ffffff;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .num-badge {
+      background: #38bdf8;
+      color: #0f2b48;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 900;
+      display: inline-block;
+    }
+    .card-body {
+      padding: 6px 8px;
+      font-size: 11px;
+      line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 3px 5px;
+      vertical-align: middle;
+    }
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-align: center;
+    }
+    .badge-high {
+      background: #dcfce7;
+      color: #15803d;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* A-F List */
+    .af-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 2.5px 0;
+      border-bottom: 1px dashed #f1f5f9;
+    }
+    .af-tag {
+      font-weight: 800;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: #fff;
+      flex-shrink: 0;
+      min-width: 58px;
+      text-align: center;
+    }
+    .tag-a { background: #eab308; color: #713f12; }
+    .tag-b { background: #ef4444; }
+    .tag-c { background: #3b82f6; }
+    .tag-d { background: #10b981; }
+    .tag-e { background: #8b5cf6; }
+    .tag-f { background: #06b6d4; }
+    .af-content {
+      font-size: 10px;
+      color: #334155;
+    }
+
+    /* Q1-Q3 Styles */
+    .q-box {
+      background: #f8fafc;
+      border-left: 3px solid #2563eb;
+      padding: 4px 6px;
+      margin-bottom: 3px;
+      border-radius: 0 4px 4px 0;
+    }
+    .q-title {
+      font-weight: 700;
+      color: #1e3a8a;
+      font-size: 10.5px;
+      margin-bottom: 2px;
+    }
+    .q-desc {
+      font-size: 10px;
+      color: #475569;
+    }
+
+    /* Proposed Scheme 8 modules */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .mod-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 3px 5px;
+      text-align: center;
+    }
+    .mod-num {
+      background: #0284c7;
+      color: #fff;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .mod-title {
+      font-weight: 700;
+      font-size: 10px;
+      color: #0f172a;
+    }
+    .mod-desc {
+      font-size: 9px;
+      color: #64748b;
+      line-height: 1.2;
+    }
+
+    /* Flowchart & Pseudocode split */
+    .scheme-split {
+      display: grid;
+      grid-template-columns: 46% 54%;
+      gap: 6px;
+    }
+    .flow-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 4px;
+      font-size: 9.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-align: center;
+    }
+    .flow-step {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+      border-radius: 3px;
+      padding: 2px;
+      font-weight: 600;
+    }
+    .flow-decision {
+      background: #fef08a;
+      border: 1px solid #fde047;
+      color: #854d0e;
+      border-radius: 3px;
+      padding: 2px;
+      font-weight: 700;
+    }
+    .code-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 9px;
+      line-height: 1.28;
+      overflow-x: auto;
+    }
+    .code-line {
+      display: block;
+    }
+    .code-num {
+      color: #64748b;
+      margin-right: 4px;
+      user-select: none;
+    }
+    .code-kw { color: #f43f5e; font-weight: bold; }
+    .code-fn { color: #38bdf8; }
+    .code-cm { color: #94a3b8; font-style: italic; }
+
+    /* A-Z SOP Table */
+    .a2z-table-wrap {
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .a2z-letter {
+      background: #1e293b;
+      color: #38bdf8;
+      font-weight: 900;
+      text-align: center;
+      width: 20px;
+    }
+
+    /* Highlight Pills */
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .pill {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      padding: 1px 6px;
+      border-radius: 12px;
+      font-size: 9.5px;
+      font-weight: 600;
+    }
+
+    /* Metrics highlight in Sec 6 */
+    .metrics-row {
+      display: flex;
+      gap: 4px;
+      justify-content: space-between;
+      margin-top: 3px;
+    }
+    .metric-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 4px;
+      flex: 1;
+      text-align: center;
+      padding: 4px 2px;
+    }
+    .metric-val {
+      font-size: 14px;
+      font-weight: 900;
+      color: #16a34a;
+    }
+    .metric-label {
+      font-size: 9px;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">🖨️ 列印 / 另存 A4 橫式 PDF</button>
+  </div>
+
+  <div class="a4-container">
+    
+    <!-- 頂部標題區 Header -->
+    <div class="header-bar">
+      <div class="header-title-box">
+        <span class="header-icon">📋</span>
+        <div>
+          <div class="header-main-title">DietSense 專題提案系統性解析資訊圖表</div>
+          <div style="font-size: 11px; color: #93c5fd; font-weight: 600;">對話式日常熱量攝取分析領域智慧代理人 (Domain AI Agent)</div>
+        </div>
+      </div>
+      <div class="header-sub">
+        <strong>依據規範：</strong>《期末專題提案作業規範》 × 《2020 A-Z SOP Outline》<br>
+        <strong>分析對象：</strong>《期中Proposal_熱量AI_Agent.docx》 ＆ 《DietSense_Proposal_Presentation.pptx》
+      </div>
+    </div>
+
+    <!-- 主體三欄網格 Main 3-Column Grid -->
+    <div class="grid-layout">
+      
+      <!-- 第一欄 Left Column -->
+      <div class="col">
+        
+        <!-- 1 符合度總覽 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">1</span>
+            符合度總覽：期末專題提案作業規範核心維度 (1.1-1.4)
+          </div>
+          <div class="card-body">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 38px;">編號</th>
+                  <th style="width: 75px;">評估維度</th>
+                  <th>對應內容（DietSense 實踐）</th>
+                  <th style="width: 50px;">符合度</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align: center; font-weight: bold;">1.1</td>
+                  <td><strong>🤖 AI Agent</strong></td>
+                  <td>LLM (GPT-4o/Gemini) 作為 Planner 核心，整合 NER 意圖辨識、Clarification Loop（多輪追問）與工具調用 (Tool Use)。</td>
+                  <td style="text-align: center;"><span class="badge-high">✔ 高</span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center; font-weight: bold;">1.2</td>
+                  <td><strong>📚 領域知識</strong></td>
+                  <td>引入能量平衡模型、Mifflin-St Jeor 公式、AMDR 巨量營養素比例、每日飲食指南與低於 1,200 kcal 安全防護網。</td>
+                  <td style="text-align: center;"><span class="badge-high">✔ 高</span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center; font-weight: bold;">1.3</td>
+                  <td><strong>📊 數據分析</strong></td>
+                  <td>整合 USDA、台灣食品成分資料庫與自建台式料理向量庫；執行不確定性量化（信賴區間而非單一數字）。</td>
+                  <td style="text-align: center;"><span class="badge-high">✔ 高</span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center; font-weight: bold;">1.4</td>
+                  <td><strong>🎯 真實應用</strong></td>
+                  <td>鎖定台灣在地飲食文化（小吃/夜市/便當）與記錄熱量認知負擔過高（85% 用戶 30 天內放棄）之公衛痛點。</td>
+                  <td style="text-align: center;"><span class="badge-high">✔ 高</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2 Abstract 六段式與 Introduction -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">2</span>
+            Abstract 六段式 (A-F) 與 Introduction (2.1-2.2)
+          </div>
+          <div class="card-body">
+            <div style="font-weight: 700; color: #1e3a8a; font-size: 11px;">2.1 Abstract: A–F 六段式對照</div>
+            
+            <div class="af-item">
+              <span class="af-tag tag-a">A 引題 (Attention)</span>
+              <span class="af-content">WHO 2025 全球 10 億肥胖人口、台灣成人過重率 47.9%、健保醫療支出突破 500 億元。</span>
+            </div>
+            <div class="af-item">
+              <span class="af-tag tag-b">B 挑戰 (But)</span>
+              <span class="af-content">手動記錄負擔高、缺乏在地食物覆蓋、自報誤差達 18%–54% 導致 85% 放棄率；通用 LLM 熱量幻覺達 35.8%。</span>
+            </div>
+            <div class="af-item">
+              <span class="af-tag tag-c">C 解藥 (Cure)</span>
+              <span class="af-content">提出 <strong>DietSense</strong> 對話式 Domain AI Agent，核心確立「LLM 負責協調，領域工具負責確定性計算」。</span>
+            </div>
+            <div class="af-item">
+              <span class="af-tag tag-d">D 方法 (Dev)</span>
+              <span class="af-content">整合八大模組架構、Whisper、NER 抽取、RAG 向量檢索、Mifflin-St Jeor TDEE 引擎與不確定性區間估算。</span>
+            </div>
+            <div class="af-item">
+              <span class="af-tag tag-e">E 評估 (Exp)</span>
+              <span class="af-content">500 筆台式料理標註語料、USDA 與台灣資料庫，對照 MyFitnessPal，規劃 20 人 7 天 User Study。</span>
+            </div>
+            <div class="af-item">
+              <span class="af-tag tag-f">F 成果 (Findings)</span>
+              <span class="af-content"><em>(Expected Outcomes)</em> 預期達成 ±20% 熱量誤差內準確率 >85%、記錄時間縮短 60%、SUS 分數 >70。</span>
+            </div>
+
+            <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #e2e8f0;">
+              <div style="font-weight: 700; color: #1e3a8a; font-size: 11px;">2.2 Introduction: 論證精神 (Why is this project worth doing?)</div>
+              <div style="font-size: 10px; color: #334155; margin-top: 2px;">
+                <strong>核心痛點：</strong>明確定義 4 大障礙（① 查詢搜尋負擔、② 份量模糊性、③ 複合菜餚拆解、④ 在地飲食缺乏）。<br>
+                <strong>橫向比較：</strong>對照並界定 MyFitnessPal、AI 照片拍照辨識、純通用問答 LLM 與特殊硬體系統之極限與差異。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Related Work -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">3</span>
+            Related Work 相關研究 (3.1-3.4)
+          </div>
+          <div class="card-body">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #0369a1;">
+              <span>3.1 AI 技術面 (50%)</span>
+              <span>3.1 領域專業知識面 (50%)</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 9.5px; color: #334155;">
+              <div style="border-right: 1px dashed #cbd5e1; padding-right: 4px;">
+                • LLM Planner + Tool Use<br>
+                • RAG 密集向量檢索增強<br>
+                • 食物命名實體識別 (NER)<br>
+                • 不確定性區間估算量化
+              </div>
+              <div>
+                • 代謝熱力學平衡模型 (Hall)<br>
+                • Mifflin-St Jeor (BMR/TDEE)<br>
+                • 巨量營養素比例 (AMDR)<br>
+                • &lt;1,200 kcal 臨床安全防護網
+              </div>
+            </div>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; font-size: 10px; color: #0f172a;">
+              <strong>3.4 文獻比較表 (Article Summary Table)：</strong> 涵蓋 5 篇跨 2024–2025 年之代表性文獻（自然語言飲食回顧、食物影像估算、個人化營養模型、對話記錄、在地圖庫），收斂出本專題之 <strong>Research Gap</strong>。
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 第二欄 Middle Column -->
+      <div class="col">
+        
+        <!-- 3.5 Deep Research 三大核心問題 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">3.5</span>
+            Deep Research：三大核心問題 (Q1-Q3)
+          </div>
+          <div class="card-body">
+            <div class="q-box">
+              <div class="q-title">Q1. 五個核心思維模式 (Mental Models)</div>
+              <div class="q-desc">
+                ① <strong>能量平衡模型</strong> (Hall 代謝病房證實) ➔ 系統動態計算 TDEE 與赤字<br>
+                ② <strong>巨量營養素組成</strong> (AMDR 碳水/蛋白/脂肪) ➔ 系統輸出圓餅分佈圖<br>
+                ③ <strong>份量估算不確定性</strong> (自報誤差 18-54%) ➔ 系統給予信賴區間<br>
+                ④ <strong>個體代謝差異</strong> (Weizmann 後餐血糖差 10 倍) ➔ 個人化檔案校正<br>
+                ⑤ <strong>行為情境意識</strong> (35% 進食與壓力相關) ➔ 用餐時段與異常模式偵測
+              </div>
+            </div>
+
+            <div class="q-box" style="border-left-color: #8b5cf6;">
+              <div class="q-title" style="color: #6d28d9;">Q2. 三個重要專業爭論 (Controversies)</div>
+              <div class="q-desc">
+                ① <strong>卡路里數量 vs. 食物品質：</strong> 赤字為減重必要條件，品質決定長期飽足感與健康 ➔ 標註加工程度與推薦原型食材。<br>
+                ② <strong>AI 份量估算可行度：</strong> LLM 對話便利但缺乏硬體 3D 精確 ➔ 採不確定性信賴區間結合手掌參照法。<br>
+                ③ <strong>通用指引 vs. 高度個人化：</strong> DRI 為公衛底線，個人化為優化方向 ➔ 分層架構並嚴格附帶醫療免責聲明。
+              </div>
+            </div>
+
+            <div class="q-box" style="border-left-color: #059669;">
+              <div class="q-title" style="color: #047857;">Q3. 十個深度理解問題 (10 In-Depth Questions)</div>
+              <div class="q-desc">
+                涵蓋 <strong>Why</strong>（相同熱量減重成效差異、BMR公式選型）、<strong>What-if</strong>（泡麵無品牌主動追問、飲食失調攔截）、<strong>Trade-off</strong>（精確度 vs. 記錄時間負擔）、<strong>Failure Case</strong>（奶奶自製炒年糕優雅降級）、<strong>Evidence</strong>（RCT對照試驗設計）、<strong>Comparison</strong>（RAG vs. Fine-tuning vs. 規則引擎）、<strong>Design Decision</strong>（對話式與傳統UI取捨）、<strong>Real-world</strong>（夜市外食資料庫建置維護）。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Proposed Scheme 系統架構與技術表示 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">4</span>
+            Proposed Scheme：系統架構與技術表示 (4.1-4.4)
+          </div>
+          <div class="card-body">
+            <div style="font-weight: 700; color: #1e3a8a; font-size: 10.5px; margin-bottom: 2px;">
+              4.1 八大模組架構（對應規範 ①～⑧ 完整串接）
+            </div>
+            
+            <div class="modules-grid">
+              <div class="mod-card">
+                <div class="mod-num">1</div>
+                <div class="mod-title">用戶情境</div>
+                <div class="mod-desc">文字/語音日常飲食對話</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">2</div>
+                <div class="mod-title">前處理與NER</div>
+                <div class="mod-desc">正規化/意圖分類/抽實體</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">3</div>
+                <div class="mod-title">Planner代理</div>
+                <div class="mod-desc">任務拆解/記憶/調度工具</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">4</div>
+                <div class="mod-title">資料取得檢索</div>
+                <div class="mod-desc">衛福部/USDA/向量RAG</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">5</div>
+                <div class="mod-title">分析運算引擎</div>
+                <div class="mod-desc">熱量公式/TDEE/區間推導</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">6</div>
+                <div class="mod-title">領域知識整合</div>
+                <div class="mod-desc">飲食指南/AMDR/&lt;1200守門</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">7</div>
+                <div class="mod-title">決策建議</div>
+                <div class="mod-desc">缺口分析/替換菜餚/警報</div>
+              </div>
+              <div class="mod-card">
+                <div class="mod-num">8</div>
+                <div class="mod-title">輸出互動</div>
+                <div class="mod-desc">Markdown/圓餅圖/引導</div>
+              </div>
+            </div>
+
+            <!-- 4.2 & 4.3 左右分流呈現 -->
+            <div class="scheme-split">
+              <!-- 4.2 流程圖簡圖 -->
+              <div class="flow-box">
+                <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">4.2 核心流程圖 (Flowchart)</div>
+                <div class="flow-step">取得使用者輸入 (文字/語音)</div>
+                <div style="font-size: 8px; color: #64748b;">▼</div>
+                <div class="flow-step">意圖分類 (log_food / analyze)</div>
+                <div style="font-size: 8px; color: #64748b;">▼</div>
+                <div class="flow-step">多來源 RAG 檢索 + 信心排序</div>
+                <div style="font-size: 8px; color: #64748b;">▼</div>
+                <div class="flow-decision">信心度 ≥ 80% 且份量明確？</div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #0284c7; padding: 0 4px;">
+                  <span>[否] ➔ 澄清追問 Loop</span>
+                  <span>[是] ➔ 確定性熱量計算</span>
+                </div>
+                <div style="font-size: 8px; color: #64748b;">▼</div>
+                <div class="flow-decision">安全檢查 (≥ 1,200 kcal?)</div>
+                <div style="font-size: 8px; color: #64748b;">▼</div>
+                <div class="flow-step" style="background: #dcfce7; border-color: #86efac; color: #166534;">輸出結構化卡片與巨量圓餅圖</div>
+              </div>
+
+              <!-- 4.3 演算法虛擬碼 -->
+              <div class="code-box">
+                <div style="color: #38bdf8; font-weight: bold; margin-bottom: 2px;">4.3 Algorithm 1: DietSense</div>
+                <span class="code-line"><span class="code-num">01:</span><span class="code-kw">def</span> <span class="code-fn">diet_agent</span>(Q, P, D):</span>
+                <span class="code-line"><span class="code-num">02:</span>  Q_norm = normalize_input(Q)</span>
+                <span class="code-line"><span class="code-num">03:</span>  intent = classify_intent(Q_norm)</span>
+                <span class="code-line"><span class="code-num">04:</span>  <span class="code-kw">if</span> intent == <span class="code-cm">"log_food"</span>:</span>
+                <span class="code-line"><span class="code-num">05:</span>    foods = extract_entities(Q_norm)</span>
+                <span class="code-line"><span class="code-num">06:</span>    <span class="code-kw">for</span> item <span class="code-kw">in</span> foods:</span>
+                <span class="code-line"><span class="code-num">07:</span>      cand = query_all_db(item.name)</span>
+                <span class="code-line"><span class="code-num">08:</span>      match, conf = rank(cand)</span>
+                <span class="code-line"><span class="code-num">09:</span>      <span class="code-kw">if</span> conf &lt; 0.80:</span>
+                <span class="code-line"><span class="code-num">10:</span>        item = <span class="code-kw">await</span> ask_user(item)</span>
+                <span class="code-line"><span class="code-num">11:</span>      kcal = calc_energy(item, match)</span>
+                <span class="code-line"><span class="code-num">12:</span>      D.append(item, kcal)</span>
+                <span class="code-line"><span class="code-num">13:</span>  tdee = mifflin_st_jeor(P)</span>
+                <span class="code-line"><span class="code-num">14:</span>  <span class="code-kw">if</span> safety_check(D) == <span class="code-cm">"DANGER"</span>:</span>
+                <span class="code-line"><span class="code-num">15:</span>    <span class="code-kw">return</span> alert_safety(), D</span>
+                <span class="code-line"><span class="code-num">16:</span>  <span class="code-kw">return</span> format_response(D, tdee)</span>
+              </div>
+            </div>
+
+            <!-- 4.4 技術特色標籤 -->
+            <div class="pill-group" style="margin-top: 4px;">
+              <span class="pill">✔ 意圖分流</span>
+              <span class="pill">✔ RAG 多來源檢索</span>
+              <span class="pill">✔ 不確定性區間估算</span>
+              <span class="pill">✔ Mifflin-St Jeor TDEE</span>
+              <span class="pill">✔ &lt;1,200 kcal 安全守門</span>
+              <span class="pill">✔ 主動追問澄清</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 第三欄 Right Column -->
+      <div class="col">
+        
+        <!-- 5 A2Z SOP 26 字母結構映射 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">5</span>
+            A2Z SOP Outline：26 字母結構完整映射
+          </div>
+          <div class="card-body" style="padding: 2px;">
+            <div class="a2z-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 18px;">字</th>
+                    <th style="width: 78px;">SOP 定義</th>
+                    <th>DietSense 專題具體落實</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td class="a2z-letter">A</td><td>Attention</td><td>2025 WHO 全球 10 億肥胖、台灣成人過重率 47.9% 與年逾 500 億健保支出。</td></tr>
+                  <tr><td class="a2z-letter">B</td><td>But</td><td>手動搜尋繁雜、缺乏在地支援、自報誤差達 18–54% 導致 85% 放棄率。</td></tr>
+                  <tr><td class="a2z-letter">C</td><td>Cure</td><td>提出整合多資料庫與 LLM 推理的「DietSense 對話式熱量分析 Domain AI Agent」。</td></tr>
+                  <tr><td class="a2z-letter">D</td><td>Development</td><td>結合 LLM 意圖推理、RAG、NER、Mifflin-St Jeor 與不確定性信賴區間量化。</td></tr>
+                  <tr><td class="a2z-letter">E</td><td>Experiments</td><td>500 筆台式料理標註集、USDA 與台灣庫，對比 MyFitnessPal，規劃 20 人 7 天測試。</td></tr>
+                  <tr><td class="a2z-letter">F</td><td>Findings</td><td>預期達 ±20% 熱量誤差內準確率 >85%、記錄時間縮短 60%、SUS >70。</td></tr>
+                  <tr><td class="a2z-letter">G</td><td>General</td><td>體重管理市場龐大（健康飲食 App 68 億美元），飲食記錄具顯著減重效益。</td></tr>
+                  <tr><td class="a2z-letter">H</td><td>However</td><td>傳統記錄認知負擔過高（搜尋/秤重/拆菜餚），通用 LLM 又易缺乏數據錨定幻覺。</td></tr>
+                  <tr><td class="a2z-letter">I</td><td>In literature</td><td>從傳統手動 App、電腦視覺辨識（Food-101），發展至結合 Tool Use 與 RAG 之 Agent。</td></tr>
+                  <tr><td class="a2z-letter">J</td><td>Judgement</td><td>手動精確但耗時；拍照難探深層油脂與份量；純 LLM 缺乏真實資料庫易幻覺。</td></tr>
+                  <tr><td class="a2z-letter">K</td><td>Keypoint</td><td>對話式降低認知負擔；多來源資料錨定解決幻覺；區間誠實傳達估算邊界。</td></tr>
+                  <tr><td class="a2z-letter">L</td><td>List org</td><td>依序規劃摘要、緒論、相關文獻、Deep Research、八大架構、演算法與評估。</td></tr>
+                  <tr><td class="a2z-letter">M</td><td>Methods</td><td>文獻分類為「文字 RAG 檢索」、「影像 CNN 分類」、「Fine-tuned LLM」與「規則引擎」。</td></tr>
+                  <tr><td class="a2z-letter">N</td><td>New proposed</td><td>「對話交互 + 台灣在地庫 + 不確定性區間 + 個人化 TDEE + 安全守門」之創新架構。</td></tr>
+                  <tr><td class="a2z-letter">O</td><td>Organize</td><td>包含 5 篇（2024–2025）之完整 Article Summary Table，明確定義 Research Gap。</td></tr>
+                  <tr><td class="a2z-letter">P</td><td>Prop. Scheme</td><td>PA 目標、PB 基礎 (USDA/衛福部)、PC 機制、PD 架構、PE 元件、PF 數學公式。</td></tr>
+                  <tr><td class="a2z-letter">Q</td><td>Question</td><td>十個深度問題：何時追問？未知菜餚如何降級？如何預防極端飲食失調？</td></tr>
+                  <tr><td class="a2z-letter">R</td><td>Res. Gap</td><td>在地食物覆蓋不足、份量不確定性忽視、對話式安全守門 Agent 應用從缺。</td></tr>
+                  <tr><td class="a2z-letter">S</td><td>Scenario</td><td>日常飲食記錄、外食小吃查詢、熱量累積分析與健康替代菜餚建議。</td></tr>
+                  <tr><td class="a2z-letter">T</td><td>Trade-off</td><td>準確度 vs. 便利性；通用標準 vs. 個人化精準；卡路里總量 vs. 食物品質。</td></tr>
+                  <tr><td class="a2z-letter">U</td><td>Uncertainty</td><td>以信心分數加權之信賴區間 [E_low, E_high] 取代虛假精確之單一數字。</td></tr>
+                  <tr><td class="a2z-letter">V</td><td>Verify</td><td>驗證記錄時間縮短 60% 且估算準確度顯著高於非專家手動記錄（User Study）。</td></tr>
+                  <tr><td class="a2z-letter">W</td><td>What</td><td>總結為解決飲食自我監控長期留存率低與高認知負擔的專業 Agent 提案。</td></tr>
+                  <tr><td class="a2z-letter">X</td><td>eXcel</td><td>專精於「台灣在地外食文化（夜市、便當、複合料理）」與「日常對話模糊輸入」。</td></tr>
+                  <tr><td class="a2z-letter">Y</td><td>Yields</td><td>依期末標準建立 GitHub Repo、README.md、完整 DESIGN.md 與展示規劃。</td></tr>
+                  <tr><td class="a2z-letter">Z</td><td>Zen</td><td>反思純文字仍受自報偏差限制，未來可結合微量營養素評估與多模態感測驗證。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 評估規劃與預期成效 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">6</span>
+            評估規劃與預期成效 (6.1-6.3)
+          </div>
+          <div class="card-body">
+            <div style="font-size: 10px; color: #334155;">
+              <strong>6.1 評估設計：</strong> 500 筆台式料理標註集、USDA + 衛福部資料庫；對照組 MyFitnessPal 手動輸入；20 名受試者進行 7 天真實測試。
+            </div>
+            
+            <div style="font-weight: 700; color: #1e3a8a; font-size: 10px; margin-top: 2px;">
+              6.2 預期成效 (Expected Outcomes - 嚴守學術誠實，非捏造數據)
+            </div>
+            <div class="metrics-row">
+              <div class="metric-card">
+                <div class="metric-val">&gt; 85%</div>
+                <div class="metric-label">熱量準確率 (±20%)</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-val">60% ↓</div>
+                <div class="metric-label">記錄時間縮短</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-val">&gt; 70</div>
+                <div class="metric-label">SUS 可用性量表</div>
+              </div>
+            </div>
+
+            <div style="font-size: 9.5px; color: #047857; background: #ecfdf5; padding: 2px 4px; border-radius: 3px; margin-top: 2px;">
+              ✔ 提升飲食記錄持續性 &nbsp;✔ 降低使用門檻與放棄率 &nbsp;✔ 支援台灣在地飲食
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 整體結論：符合度與亮點 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="num-badge">7</span>
+            整體結論：符合度與專案亮點 (7.1-7.3)
+          </div>
+          <div class="card-body" style="padding: 4px 6px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; text-align: center; font-size: 9.5px;">
+              <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 3px 2px;">
+                <div style="font-weight: 800; color: #1e40af;">7.1 高度符合</div>
+                <div style="color: #475569; font-size: 8.5px;">完全涵蓋期末規範四大核心維度</div>
+              </div>
+              <div style="background: #fdf4ff; border: 1px solid #f0abfc; border-radius: 4px; padding: 3px 2px;">
+                <div style="font-weight: 800; color: #86198f;">7.2 方法完整</div>
+                <div style="color: #475569; font-size: 8.5px;">A2Z 26 字母完整對照論證</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 3px 2px;">
+                <div style="font-weight: 800; color: #166534;">7.3 核心亮點</div>
+                <div style="color: #475569; font-size: 8.5px;">對話式 Agent + 在地食物 + 安全守門</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
